@@ -3,5 +3,6 @@
 
     <string name="hello">Hello World, OpenCVentureActivity!</string>
     <string name="app_name">OpenCVenture</string>
+    <string name="startCamText">Start Camera</string>
 
 </resources>

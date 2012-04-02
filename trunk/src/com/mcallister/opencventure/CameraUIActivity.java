@@ -3,11 +3,10 @@ package com.mcallister.opencventure;
 import android.app.Activity;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.view.View;
-import android.view.View.OnClickListener;
+import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
-public class CameraUIActivity extends Activity implements OnClickListener{
+public class CameraUIActivity extends Activity{
 	private Camera mCamera = null;
 	private CameraPreview camPreview = null;
 	private FrameLayout previewFrame = null;
@@ -25,7 +24,6 @@ public class CameraUIActivity extends Activity implements OnClickListener{
         camPreview = new CameraPreview(this, mCamera);
         previewFrame = (FrameLayout) findViewById(R.id.camera_preview);
         previewFrame.addView(camPreview);
-        
     }
     
     /** Re-initializes camera, preview, if necessary, and resumes preview */
@@ -112,9 +110,10 @@ public class CameraUIActivity extends Activity implements OnClickListener{
     	}
     }
     
-    
-    public void onClick(View view){
-    	System.out.println("CameraUIActivity.onClick(): Click Detected");
+    public boolean onTouchEvent(MotionEvent event){
+    	System.out.println("CameraUIActivity.onTouchEvent: X: " + event.getX() + " Y: " + event.getY());
+    	
+    	return true;
     }
     
     /** safely access an instance of the camera */

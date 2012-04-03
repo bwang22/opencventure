@@ -11,10 +11,17 @@ import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 public class CameraUIActivity extends Activity{
 	private Camera mCamera = null;
+	
+	private CameraPreview camPreview = null;
+	private FrameLayout previewFrame = null;
+	
 	private PictureCallback mPicture = null;
 	private File mPictureFile = null;
 	private String TAG = "CameraUIActvity";
@@ -49,6 +56,22 @@ public class CameraUIActivity extends Activity{
     		}
     	}
         
+    	// create button and set respective onClickListener
+        Button takePictureButton = (Button) findViewById(R.id.takePictureButton);
+        takePictureButton.setOnClickListener(
+	        new View.OnClickListener() {
+	            public void onClick(View v) {
+	                // get an image from the camera
+	                mCamera.takePicture(null, null, mPicture);
+	            }
+	        }
+	    );
+    	
+    	// create preview
+    	camPreview = new CameraPreview(this, mCamera);
+        previewFrame = (FrameLayout) findViewById(R.id.camera_preview);
+        previewFrame.addView(camPreview);
+            	
     	mPicture = new PictureCallback() {
     		public void onPictureTaken(byte[] imageData, Camera camera) {
     			Log.i(TAG, "onPictureTaken() started");
@@ -59,6 +82,7 @@ public class CameraUIActivity extends Activity{
 	    	        FileOutputStream fos = new FileOutputStream(mPictureFile);
 	    	        fos.write(imageData);
 	    	        fos.close();
+	    	        Log.i(TAG, "Picture written to SD");
     	        }
     	        catch( IOException e )
     	        {
@@ -67,14 +91,14 @@ public class CameraUIActivity extends Activity{
     		}
     	};
     	
-
+    	/*
     	ImageView imageView = (ImageView) findViewById(R.id.imageView);
     	
     	// Capture and process images
 		mCamera.takePicture(null, null, mPicture);
     	ImageProcessing.ProcessImage(mPicture);
     	//imageView.setImageURI(Uri.fromFile(mPictureFile));
-    	
+    	*/
     }
     
     
@@ -130,6 +154,8 @@ public class CameraUIActivity extends Activity{
     	Parameters camParams = cam.getParameters();
     	camParams.setPictureFormat(JPEG);
     	cam.setParameters(camParams);
+    	
+    	cam.setDisplayOrientation(90); // rotate to portrait mode
     	
     	System.out.println("CameraUIActivity.initCamera(): Camera initialized");
     }

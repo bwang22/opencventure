@@ -1,32 +1,33 @@
 package com.mcallister.opencventure;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import android.app.Activity;
 import android.hardware.Camera;
+import android.hardware.Camera.Parameters;
+import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
-import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 public class CameraUIActivity extends Activity{
 	private Camera mCamera = null;
-	private CameraPreview camPreview = null;
-	private FrameLayout previewFrame = null;
+	private PictureCallback mPicture = null;
+	private File mPictureFile = null;
+	private String TAG = "CameraUIActvity";
 	
-	/** Initializes camera and begins preview */
+	/** Displays camera_ui layout when activity is created */
     @Override
 	public void onCreate( Bundle savedInstanceState ){
     	super.onCreate( savedInstanceState );
         setContentView(R.layout.camera_ui);
     	System.out.println("CameraUIActivity.onCreate(): Created");
-        
-        mCamera = getCameraInstance();
-        initCamera( mCamera );
-        
-        camPreview = new CameraPreview(this, mCamera);
-        previewFrame = (FrameLayout) findViewById(R.id.camera_preview);
-        previewFrame.addView(camPreview);
     }
     
-    /** Re-initializes camera, preview, if necessary, and resumes preview */
+    /** Initializes camera, preview, if necessary, and resumes preview */
     public void onResume( ){
     	super.onResume();    	
     	setContentView(R.layout.camera_ui);
@@ -48,38 +49,32 @@ public class CameraUIActivity extends Activity{
     		}
     	}
         
-    	camPreview = new CameraPreview(this, mCamera);
-    	
-    	previewFrame = (FrameLayout) findViewById(R.id.camera_preview);
-	    previewFrame.addView(camPreview);
-    }
-    
-    /** Re-initializes camera, preview, if necessary, and resumes preview */
-    public void onRestart( ){
-    	super.onRestart();
-    	setContentView(R.layout.camera_ui);
-    	System.out.println("CameraUIActivity.onRestart(): Restarting");
-        
-    	if ( null == mCamera ){
-            mCamera = getCameraInstance();
-            initCamera( mCamera );
-    	}
-    	else{
-    		try{
-    			mCamera.reconnect();
-    	    	System.out.println("CameraUIActivity.onRestart(): Successfully acquired camera");
+    	mPicture = new PictureCallback() {
+    		public void onPictureTaken(byte[] imageData, Camera camera) {
+    			Log.i(TAG, "onPictureTaken() started");
+    	        mPictureFile = ImageProcessing.getImageOutputFile(1); // 1 = MEDIA_TYPE_IMAGE
+    	            	        
+    	        try{
+    	        	mPictureFile.createNewFile();
+	    	        FileOutputStream fos = new FileOutputStream(mPictureFile);
+	    	        fos.write(imageData);
+	    	        fos.close();
+    	        }
+    	        catch( IOException e )
+    	        {
+    	        	Log.e(TAG, "Failed to write image data to SD");
+    	        }
     		}
-    		catch (Exception e){
-    			System.err.println("CameraUIActivity.onRestart(): Could not access camera. Stack Trace:");
-    			e.printStackTrace();
-    			System.exit(0);    			
-    		}
-    	}
-        
-    	camPreview = new CameraPreview(this, mCamera);
+    	};
     	
-    	previewFrame = (FrameLayout) findViewById(R.id.camera_preview);
-	    previewFrame.addView(camPreview);
+
+    	ImageView imageView = (ImageView) findViewById(R.id.imageView);
+    	
+    	// Capture and process images
+		mCamera.takePicture(null, null, mPicture);
+    	ImageProcessing.ProcessImage(mPicture);
+    	//imageView.setImageURI(Uri.fromFile(mPictureFile));
+    	
     }
     
     
@@ -96,18 +91,13 @@ public class CameraUIActivity extends Activity{
     	super.onStop();
     	System.out.println("CameraUIActivity.onStop(): stopped, releasing camera, nulling member vars");
     	mCamera.release();
-    	mCamera = null;
-    	camPreview = null;
-    	previewFrame = null;
     }
 
     /** Releases camera so other apps can use after being destroyed */
     public void onDestroy(){
     	super.onDestroy();
     	System.out.println("CameraUIActivity.onDestroy(): destroyed, releasing camera, nulling member vars");
-    	if (mCamera != null ){
-	    	mCamera.release();
-    	}
+	    mCamera.release();
     }
     
     public boolean onTouchEvent(MotionEvent event){
@@ -135,7 +125,12 @@ public class CameraUIActivity extends Activity{
     
     /** Initialize camera and begin recording */
     public void initCamera( Camera cam ){
-    	cam.setDisplayOrientation(90); // rotate to portrait mode
+    	int JPEG = 0x100;
+    	
+    	Parameters camParams = cam.getParameters();
+    	camParams.setPictureFormat(JPEG);
+    	cam.setParameters(camParams);
+    	
     	System.out.println("CameraUIActivity.initCamera(): Camera initialized");
     }
 }

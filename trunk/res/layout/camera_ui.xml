@@ -2,28 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:gravity="center|left|right|top"
-    android:orientation="vertical" >
-
-    <Button
-        android:id="@+id/takePictureButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Take Picture" />
-
+    android:gravity="fill_horizontal"
+    android:orientation="horizontal" 
+    android:baselineAligned="false" >
+
     <FrameLayout
-        android:id="@+id/camera_preview"
+        android:id="@+id/preview_frame"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.16" >
+        android:layout_height="match_parent" >
 
     </FrameLayout>
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.23"
-        android:src="@android:drawable/progress_indeterminate_horizontal" />
 
 </LinearLayout>

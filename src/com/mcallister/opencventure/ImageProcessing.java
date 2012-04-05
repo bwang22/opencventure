@@ -20,6 +20,7 @@ public class ImageProcessing {
     public static void ProcessImage( PictureCallback pic ){
     	Log.i(TAG, "Begin ProcessImage");
     }
+    
 	
 	/** Create a file Uri for saving an image or video */
 	public static Uri getOutputMediaFileUri(int type){

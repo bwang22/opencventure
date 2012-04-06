@@ -19,7 +19,7 @@ public class CameraUIActivity extends Activity{
 	public void onCreate( Bundle savedInstanceState ){
     	super.onCreate( savedInstanceState );
         setContentView(R.layout.camera_ui);
-    	System.out.println("CameraUIActivity.onCreate(): Created");
+    	Log.i(TAG, "Created");
     	
     	// acquire camera and initialize params
     	if ( !safeCameraOpen() ){
@@ -37,6 +37,7 @@ public class CameraUIActivity extends Activity{
     
     public void onStop(){
     	super.onStop();
+    	Log.i(TAG, "Stopping");
     	
     	// safely release camera
 		if (mCamera != null) {
@@ -47,7 +48,7 @@ public class CameraUIActivity extends Activity{
     }
     
     public boolean onTouchEvent(MotionEvent event){
-    	System.out.println("CameraUIActivity.onTouchEvent: X: " + event.getX() + " Y: " + event.getY());
+    	Log.i(TAG, "Touch Coords: (" + event.getX() + ", " + event.getY() + ")");
     	
     	return true;
     }
@@ -74,6 +75,6 @@ public class CameraUIActivity extends Activity{
     	camParams.setRotation(90);
     	mCamera.setParameters(camParams);
     	
-    	System.out.println("CameraUIActivity.initCamera(): Camera initialized");
+    	Log.i(TAG, "Camera initialized");
     }
 }

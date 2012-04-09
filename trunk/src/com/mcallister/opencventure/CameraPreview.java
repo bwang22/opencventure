@@ -13,7 +13,7 @@ import android.view.SurfaceView;
 class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
     private Camera mCamera;
-	
+    	
     private String TAG = "CameraPreview";
 
     public CameraPreview(Context context, Camera camera) {
@@ -33,7 +33,7 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     	// set up preview callback
     	mCamera.setPreviewCallback(new PreviewCallback(){
     	    public void onPreviewFrame(byte[] data, Camera camera){
-    	    	Log.i(TAG, "onPreviewFrame called!");
+    	    	//Log.i(TAG, "onPreviewFrame called!");
     	    }
     	});
 	}
@@ -51,5 +51,5 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
 	/** IGNORED. Activity will handle cleanup */
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		// ignored
-	}    
+	}
 }

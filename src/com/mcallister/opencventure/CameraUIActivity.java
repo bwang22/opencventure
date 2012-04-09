@@ -5,12 +5,12 @@ import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
 public class CameraUIActivity extends Activity{
 	private Camera mCamera;
 	private CameraPreview mPreview;
+	private DrawingView mDrawingView;
 	
 	private String TAG = "CameraUIActivity";
 	
@@ -31,8 +31,10 @@ public class CameraUIActivity extends Activity{
     	
     	// create preview
     	mPreview = new CameraPreview(this, mCamera);
+    	mDrawingView = new DrawingView(this);
     	FrameLayout preview = (FrameLayout) findViewById(R.id.preview_frame);
     	preview.addView(mPreview);
+    	preview.addView(mDrawingView);
     }
     
     public void onStop(){
@@ -45,12 +47,6 @@ public class CameraUIActivity extends Activity{
 			mCamera.release();
 			mCamera = null;
 		}
-    }
-    
-    public boolean onTouchEvent(MotionEvent event){
-    	Log.i(TAG, "Touch Coords: (" + event.getX() + ", " + event.getY() + ")");
-    	
-    	return true;
     }
     
     /** safely access an instance of the camera */

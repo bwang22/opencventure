@@ -5,7 +5,7 @@
     android:gravity="fill_horizontal"
     android:orientation="horizontal" 
     android:baselineAligned="false" >
-
+
     <FrameLayout
         android:id="@+id/preview_frame"
         android:layout_width="match_parent"

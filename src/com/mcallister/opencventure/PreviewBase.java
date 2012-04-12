@@ -2,6 +2,8 @@ package com.mcallister.opencventure;
 
 import java.util.List;
 
+import org.opencv.android.Utils;
+import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
@@ -65,12 +67,6 @@ public abstract class PreviewBase extends SurfaceView implements SurfaceHolder.C
 			// set preview size
 			mVideoCapture.set(Highgui.CV_CAP_PROP_FRAME_WIDTH, mFrameWidth);
 			mVideoCapture.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT, mFrameHeight);
-			
-			Canvas canvas = mHolder.lockCanvas();
-			Paint paint = new Paint();
-			paint.setColor(Color.GREEN);
-			canvas.drawCircle(100, 100, 10, paint);
-			mHolder.unlockCanvasAndPost(canvas);
 		}
 	}
 
@@ -89,18 +85,74 @@ public abstract class PreviewBase extends SurfaceView implements SurfaceHolder.C
 		}
 	}
 
-	/** IGNORED. Activity will handle cleanup */
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		Log.i(TAG, "surfaceDestroyed");
         if (mVideoCapture != null) {
-            mVideoCapture.release();
-            mVideoCapture = null;
+        	synchronized (this) {
+	            mVideoCapture.release();
+	            mVideoCapture = null;
+        	}
         }
 	}
 	
-	protected abstract Bitmap processFrame(byte[] data);
+	protected abstract Bitmap processFrame( VideoCapture capture );
 	
 	public void run() {
 		Log.i(TAG, "Starting processing thread");
+		
+		Bitmap bmp = null;
+		Canvas canvas = null;
+		float x = 0;
+		float y = 0;
+		
+		Mat image = new Mat();
+		
+		while( true ) {
+			Log.i( TAG, "Before sync" );
+			
+			//synchronized (this) {
+
+				Log.i( TAG, "After sync" );
+				// check for invalid video
+				if ( mVideoCapture == null ){
+					Log.e(TAG, "Invalid VideoCapture");
+					break;
+				}
+				Log.i( TAG, "After VC Sanity check" );
+				
+				mVideoCapture.grab();
+				Log.i( TAG, "After capture read" );
+				/*
+				// grab next frame and check for error
+				if ( !mVideoCapture.grab() ) {
+					Log.e(TAG, "VideoCapture grab() failed");
+					break;
+				}
+				
+				Log.i( TAG, "Before processFrame" );
+				bmp = processFrame( mVideoCapture );
+				Log.i( TAG, "After processFrame" );
+				*/
+				Bitmap.createBitmap(image.cols(), image.rows(), Bitmap.Config.ARGB_8888);
+				Utils.matToBitmap(image, bmp);
+			//}
+			
+			if ( bmp != null ) {
+				canvas = mHolder.lockCanvas();
+				
+				// check for canvas locking errors
+				if ( canvas != null ) {
+                    //canvas.drawBitmap(bmp, (canvas.getWidth() - bmp.getWidth()) / 2, (canvas.getHeight() - bmp.getHeight()) / 2, null);
+                    Paint paint = new Paint();
+                    paint.setColor(Color.GREEN);
+                    canvas.drawCircle(x++, y++, 10, paint);
+                    mHolder.unlockCanvasAndPost(canvas);
+				}
+				
+				bmp.recycle();
+			}
+		}
+		
+		Log.i(TAG, "Exiting processing thread");
 	}
 }

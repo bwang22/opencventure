@@ -1,12 +1,17 @@
 package com.mcallister.opencventure;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.FrameLayout;
 
 public class CameraUIActivity extends Activity{
 	private DrawingView mDrawingView;
+	private PreviewView mPreviewView;
+	private Camera mCamera;
+	public static volatile Bitmap sharedBmp;
 	
 	private String TAG = "CameraUIActivity";
 	
@@ -17,14 +22,49 @@ public class CameraUIActivity extends Activity{
         setContentView(R.layout.camera_ui);
     	Log.i(TAG, "Created");
     	
+    	// check for camera initialization errors
+    	if ( !initCamera() ) {
+        	Log.e(TAG, "Failed to init camera");
+        	System.exit(0);
+        }
+    	
     	// create preview
+    	mPreviewView = new PreviewView(this, mCamera);
     	mDrawingView = new DrawingView(this);
-    	FrameLayout preview = (FrameLayout) findViewById(R.id.preview_frame);
-    	preview.addView(mDrawingView);
+    	FrameLayout frame = (FrameLayout) findViewById(R.id.preview_frame);
+    	frame.addView(mPreviewView);
+    	frame.addView(mDrawingView);
     }
     
     public void onStop(){
     	super.onStop();
     	Log.i(TAG, "Stopping");
+
+    	try {
+    		mCamera.setPreviewDisplay(null);
+		    mCamera.stopPreview();
+	    	mCamera.release();
+    	} catch (Exception e ) {
+    		Log.e(TAG, "Destroy failed: " + e.getMessage());
+    		e.printStackTrace();
+    	}
+    }
+    
+    /** initializes camera and camera parameters */
+    private boolean initCamera(){
+    	try{
+    		mCamera = Camera.open();
+    		
+    		Camera.Parameters params = mCamera.getParameters();
+    		Log.i(TAG, "preview format: " + Integer.toHexString(params.getPreviewFormat()));
+    		
+    		
+    	} catch ( Exception e ) {
+    		Log.e(TAG, "Failed to init cam: " + e.getMessage());
+    		e.printStackTrace();
+    		return false;
+    	}
+    	
+    	return true;
     }
 }

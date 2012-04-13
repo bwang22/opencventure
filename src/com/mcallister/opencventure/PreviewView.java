@@ -58,7 +58,7 @@ public class PreviewView extends SurfaceView implements SurfaceHolder.Callback {
 	            Size previewSize = camera.getParameters().getPreviewSize(); 
 	            YuvImage yuvimage=new YuvImage(data, ImageFormat.NV21, previewSize.width, previewSize.height, null);
 	            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	            yuvimage.compressToJpeg(new Rect(0, 0, previewSize.width, previewSize.height), 80, baos);
+	            yuvimage.compressToJpeg(new Rect(0, 0, previewSize.width, previewSize.height), 100, baos);
 	            byte[] jdata = baos.toByteArray();
 
 	            // Convert to Bitmap

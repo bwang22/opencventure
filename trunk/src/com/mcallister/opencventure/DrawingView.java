@@ -1,75 +1,45 @@
 package com.mcallister.opencventure;
 
-import org.opencv.android.Utils;
-import org.opencv.core.Mat;
-import org.opencv.highgui.Highgui;
-import org.opencv.highgui.VideoCapture;
-
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 
-public class DrawingView extends PreviewBase{
-	private boolean mTouched;
-    private float mTouchX, mTouchY;
-    
-    private Mat mRGBa;
+public class DrawingView extends SurfaceView implements Runnable{
+	public PreviewView mPreviewView;
+	private SurfaceHolder mHolder;
+	private Canvas mCanvas;
+	private Paint mPaint;
 	
-	private static String TAG = "DrawingView";
-	
+	private String TAG = "DrawingView";
 	
 	public DrawingView(Context context) {
 		super(context);
+		
+		mHolder = getHolder();
+		mHolder.setFormat(PixelFormat.TRANSLUCENT);
+		mPaint = new Paint();
+		mPaint.setColor(Color.GREEN);
+		
+		(new Thread(this)).start();
 	}
 	
-	@Override
-	public void surfaceChanged( SurfaceHolder _holder, int format, int width, int height ) {
-        super.surfaceChanged(_holder, format, width, height);
-        
-        synchronized (this) {
-        	mRGBa = new Mat();
-        }
+	public void run() {
+		Log.i(TAG, "Starting processing thread");
+		int i=0;
+		while( this.isShown() ) {
+			try {
+				mCanvas = mHolder.lockCanvas();
+				mCanvas.drawCircle(i, i, 10, mPaint);
+				mHolder.unlockCanvasAndPost(mCanvas);
+				i++;
+			} catch ( Exception e ) {
+				Log.i(TAG, "mPreviewView.sharedBmp == null");
+			}
+		}
 	}
-	
-	@Override
-	protected Bitmap processFrame( VideoCapture capture ){
-		Log.i(TAG, "processFrame()");
-		
-		// load captured frame into matrix and return as bitmap
-		capture.retrieve( mRGBa, Highgui.CV_CAP_ANDROID_COLOR_FRAME_RGBA );
-		Bitmap bmp = Bitmap.createBitmap( mRGBa.cols(), mRGBa.rows(), Bitmap.Config.ARGB_8888 );
-		
-		if ( Utils.matToBitmap( mRGBa, bmp ) )
-			return bmp;
-		
-		bmp.recycle();
-		return null;
-	}
-	
-    public boolean onTouchEvent(MotionEvent event){
-    	mTouched = true;
-    	mTouchX = event.getX();
-    	mTouchY = event.getY();
-    	Log.i(TAG, "Touch Coords: (" + mTouchX + ", " + mTouchY + ")");
-    	
-    	postInvalidate();
-    	
-    	return true;
-    }    
-	
-
-    protected void onDraw(Canvas canvas){
-    	Log.i(TAG, "onDraw called");
-    	
-    	if( mTouched ){
-    		Paint paint = new Paint();
-    		paint.setColor(Color.GREEN);
-    		canvas.drawCircle(mTouchX, mTouchY, 50, paint);
-    	}
-    }    
 }

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.WindowManager.LayoutParams;
 import android.widget.FrameLayout;
 
 public class CameraUIActivity extends Activity{
@@ -21,6 +22,8 @@ public class CameraUIActivity extends Activity{
     	super.onCreate( savedInstanceState );
         setContentView(R.layout.camera_ui);
     	Log.i(TAG, "Created");
+        
+    	getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
     	
     	// check for camera initialization errors
     	if ( !initCamera() ) {

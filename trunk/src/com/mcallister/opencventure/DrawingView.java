@@ -124,11 +124,8 @@ public class DrawingView extends SurfaceView implements Runnable{
 				Log.i(TAG, "frame processed");
 				
 				mCanvas = mHolder.lockCanvas();
-				Log.i(TAG, "canvas locked");
 				mCanvas.drawBitmap(mBmp, 100, 0, null);
-				Log.i(TAG, "bitmap drawn");
 				mHolder.unlockCanvasAndPost(mCanvas);
-				Log.i(TAG, "canvas unlocked");
 				
 			} catch ( Exception e ) {
 				Log.e(TAG, "Exception while processing: " + e.getMessage());

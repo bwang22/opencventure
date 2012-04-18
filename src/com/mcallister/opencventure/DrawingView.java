@@ -10,6 +10,7 @@ import java.util.List;
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -99,8 +100,37 @@ public class DrawingView extends SurfaceView implements Runnable{
             mCascade.detectMultiScale(imageMat, faces, 1.1, 2, 2 // TODO: objdetect.CV_HAAR_SCALE_IMAGE
                     , new Size(faceSize, faceSize));
 
-            for (Rect r : faces)
-                Core.rectangle(imageMat, r.tl(), r.br(), new Scalar(0, 255, 0, 255), 3);
+            // draw alien face for all faces found
+            for (Rect r : faces) {
+                // head
+            	Core.rectangle(imageMat, r.tl(), r.br(), new Scalar(0, 255, 0, 255), -1);
+            	
+            	// eyes
+            	Point leftEyeTL = new Point();
+            	leftEyeTL.x = r.x + (r.width/4);
+            	leftEyeTL.y = r.y + (r.height/8);
+            	Point leftEyeBR = new Point();
+            	leftEyeBR.x = leftEyeTL.x + (r.width/10);
+            	leftEyeBR.y = leftEyeTL.y + (r.height/10);
+            	Core.rectangle(imageMat, leftEyeTL, leftEyeBR, new Scalar(255, 0, 0, 255), -1);
+            	
+            	Point rightEyeTL = new Point();
+            	rightEyeTL.x = (r.x + r.width) - (r.width/4) - (r.width/10);
+            	rightEyeTL.y = r.y + (r.height/8);
+            	Point rightEyeBR = new Point();
+            	rightEyeBR.x = rightEyeTL.x + (r.width/10);
+            	rightEyeBR.y = rightEyeTL.y + (r.height/10);
+            	Core.rectangle(imageMat, rightEyeTL, rightEyeBR, new Scalar(255, 0, 0, 255), -1);
+            
+            	// mouth
+            	Point mouthTL = new Point();
+            	mouthTL.x = r.x + (r.width/5);
+            	mouthTL.y = r.y + 3*(r.height/4);
+            	Point mouthBR = new Point();
+            	mouthBR.x = r.x + 4*(r.width/5);
+            	mouthBR.y = mouthTL.y + (r.height/5);
+            	Core.rectangle(imageMat, mouthTL, mouthBR, new Scalar(255, 0, 0, 255), -1);
+            }
         }
 
         Bitmap bmp = Bitmap.createBitmap(imageMat.cols(), imageMat.rows(), Bitmap.Config.ARGB_8888);

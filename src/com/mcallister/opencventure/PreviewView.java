@@ -6,8 +6,6 @@ import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.Size;
@@ -19,7 +17,6 @@ import android.view.SurfaceView;
 public class PreviewView extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
     private Camera mCamera;
-    private BitmapFactory.Options mBmpOpts;
     
     private String TAG = "PreviewView";
 
@@ -68,11 +65,6 @@ public class PreviewView extends SurfaceView implements SurfaceHolder.Callback {
     /** Tells the camera where to draw the preview when created */
     public void surfaceCreated(SurfaceHolder holder) {              
 	    Log.i(TAG, "Surface Created");
-	    
-        // set bitmap options
-    	mBmpOpts = new BitmapFactory.Options();
-    	mBmpOpts.inDither = true;
-    	mBmpOpts.inPreferredConfig = Bitmap.Config.ARGB_8888;
     }
 
     /** Stop preview and release camera */

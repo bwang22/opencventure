@@ -39,7 +39,6 @@ public class DrawingView extends SurfaceView implements Runnable{
 		super(context);
 		
 		mHolder = getHolder();
-		//mHolder.setFormat(PixelFormat.TRANSLUCENT);
 		mPaint = new Paint();
 		mPaint.setColor(Color.GREEN);
 		
@@ -66,6 +65,8 @@ public class DrawingView extends SurfaceView implements Runnable{
 				}
 			}
 		}
+		else
+			Log.i(TAG, "No faces found :(");
 		
 		if ( !hit )
 			Log.i(TAG, "Miss :(");
@@ -113,7 +114,7 @@ public class DrawingView extends SurfaceView implements Runnable{
         if (mCascade != null) {
             int height = imageMat.rows();
             int faceSize = Math.round(height * 0.2f);
-            CameraUIActivity.faces = new LinkedList<Rect>();
+            //CameraUIActivity.faces = new LinkedList<Rect>();
             mCascade.detectMultiScale(imageMat, CameraUIActivity.faces, 1.1, 2, 2 // TODO: objdetect.CV_HAAR_SCALE_IMAGE
                     , new Size(faceSize, faceSize));
 
@@ -162,6 +163,8 @@ public class DrawingView extends SurfaceView implements Runnable{
 	public void run() {
 		Log.i(TAG, "Starting processing thread");
 
+		CameraUIActivity.faces = new LinkedList<Rect>();
+		
 		while( this.isShown() ) {
 			try {
 				if ( CameraUIActivity.sharedMat == null )
@@ -171,7 +174,7 @@ public class DrawingView extends SurfaceView implements Runnable{
 				Log.i(TAG, "frame processed");
 				
 				mCanvas = mHolder.lockCanvas();
-				mCanvas.drawBitmap(mBmp, 100, 0, null);
+				mCanvas.drawBitmap(mBmp, 0, 0, null);
 				mHolder.unlockCanvasAndPost(mCanvas);
 				
 			} catch ( Exception e ) {

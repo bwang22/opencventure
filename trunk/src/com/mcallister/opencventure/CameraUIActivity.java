@@ -9,6 +9,8 @@ import android.app.Activity;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.FrameLayout;
 
@@ -25,6 +27,12 @@ public class CameraUIActivity extends Activity{
     @Override
 	public void onCreate( Bundle savedInstanceState ){
     	super.onCreate( savedInstanceState );
+    	//Remove title bar
+    	this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+    	//Remove notification bar
+    	this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    	
         setContentView(R.layout.camera_ui);
     	Log.i(TAG, "Created");
         
@@ -34,9 +42,7 @@ public class CameraUIActivity extends Activity{
     	if ( !initCamera() ) {
         	Log.e(TAG, "Failed to init camera");
         	System.exit(0);
-        }
-    	
-    	
+        }    	
     	
     	// create preview
     	mPreviewView = new PreviewView(this, mCamera);
@@ -66,7 +72,7 @@ public class CameraUIActivity extends Activity{
     		mCamera = Camera.open();
     		
     		Camera.Parameters params = mCamera.getParameters();
-    		params.setPreviewSize(640, 480);
+    		params.setPreviewSize(854, 480);
     		mCamera.setParameters(params);
     		Log.i(TAG, "preview format: " + Integer.toHexString(params.getPreviewFormat()));
     		

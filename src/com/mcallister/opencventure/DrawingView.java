@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
@@ -22,6 +21,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -48,6 +48,30 @@ public class DrawingView extends SurfaceView implements Runnable{
 		(new Thread(this)).start();
 	}
 	
+	public boolean onTouchEvent( MotionEvent event ) {
+		Log.i(TAG, "Touch at: (" + event.getRawX() + ", " + event.getRawY() + ")");
+		
+		boolean hit = false;
+		
+		Point touchPoint = new Point();
+		touchPoint.x = event.getRawX();
+		touchPoint.y = event.getRawY();
+		
+		if ( CameraUIActivity.faces != null ) {
+			for ( Rect r : CameraUIActivity.faces ) {
+				Log.i(TAG, "Rect at: " + r.tl().toString() + " " + r.br().toString());
+				if ( r.contains(touchPoint) ) {
+					Log.i(TAG, "HIT! :D");
+					hit = true;
+				}
+			}
+		}
+		
+		if ( !hit )
+			Log.i(TAG, "Miss :(");
+		
+		return hit;
+	}	
 	
 	/** load classifier for face detection */
 	private boolean loadCascade( Context context ) {
@@ -84,24 +108,17 @@ public class DrawingView extends SurfaceView implements Runnable{
 		return true;
 	}
 	
-	private Bitmap processFrame(Bitmap imageBmp) {
-		// need to convert to aRGB or bitmaptoMat won't work
-		Bitmap argbBmp = imageBmp.copy(Bitmap.Config.ARGB_8888, false);
-		
-		// create Mat from bmp
-		Mat imageMat = new Mat();	
-		imageMat = Utils.bitmapToMat(argbBmp);
-		
+	private Bitmap processFrame(Mat imageMat) {		
 		// compare to classifier to find face
         if (mCascade != null) {
             int height = imageMat.rows();
             int faceSize = Math.round(height * 0.2f);
-            List<Rect> faces = new LinkedList<Rect>();
-            mCascade.detectMultiScale(imageMat, faces, 1.1, 2, 2 // TODO: objdetect.CV_HAAR_SCALE_IMAGE
+            CameraUIActivity.faces = new LinkedList<Rect>();
+            mCascade.detectMultiScale(imageMat, CameraUIActivity.faces, 1.1, 2, 2 // TODO: objdetect.CV_HAAR_SCALE_IMAGE
                     , new Size(faceSize, faceSize));
 
             // draw alien face for all faces found
-            for (Rect r : faces) {
+            for (Rect r : CameraUIActivity.faces) {
                 // head
             	Core.rectangle(imageMat, r.tl(), r.br(), new Scalar(0, 255, 0, 255), -1);
             	
@@ -147,10 +164,10 @@ public class DrawingView extends SurfaceView implements Runnable{
 
 		while( this.isShown() ) {
 			try {
-				if ( CameraUIActivity.sharedBmp == null )
+				if ( CameraUIActivity.sharedMat == null )
 					continue;
 				
-				mBmp = processFrame( CameraUIActivity.sharedBmp );
+				mBmp = processFrame( CameraUIActivity.sharedMat );
 				Log.i(TAG, "frame processed");
 				
 				mCanvas = mHolder.lockCanvas();

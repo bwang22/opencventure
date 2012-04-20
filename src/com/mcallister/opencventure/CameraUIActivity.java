@@ -1,7 +1,11 @@
 package com.mcallister.opencventure;
 
+import java.util.List;
+
+import org.opencv.core.Mat;
+import org.opencv.core.Rect;
+
 import android.app.Activity;
-import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,7 +16,8 @@ public class CameraUIActivity extends Activity{
 	private DrawingView mDrawingView;
 	private PreviewView mPreviewView;
 	private Camera mCamera;
-	public static volatile Bitmap sharedBmp;
+	public static volatile Mat sharedMat;
+	public static volatile List<Rect> faces;
 	
 	private String TAG = "CameraUIActivity";
 	
@@ -30,6 +35,8 @@ public class CameraUIActivity extends Activity{
         	Log.e(TAG, "Failed to init camera");
         	System.exit(0);
         }
+    	
+    	
     	
     	// create preview
     	mPreviewView = new PreviewView(this, mCamera);
@@ -59,6 +66,8 @@ public class CameraUIActivity extends Activity{
     		mCamera = Camera.open();
     		
     		Camera.Parameters params = mCamera.getParameters();
+    		params.setPreviewSize(640, 480);
+    		mCamera.setParameters(params);
     		Log.i(TAG, "preview format: " + Integer.toHexString(params.getPreviewFormat()));
     		
     		

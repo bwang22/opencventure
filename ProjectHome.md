@@ -1,0 +1,1 @@
+The goal is to create a game that allows the user to virtually interact with their environment through the use of their Android phone's camera.
